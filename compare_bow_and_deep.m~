@@ -1,0 +1,30 @@
+addpath('./provided_code/');
+framesdir = './frames/';
+siftdir = './sift/';
+
+img1_i = 444;
+img2_i = 335;
+
+fname = [siftdir '/' fnames(img1_i).name];
+
+load(fname, 'imname', 'descriptors', 'deepFC7');
+origdeep = deepFC7;
+numfeats = size(descriptors,1);
+    
+% read in the associated image
+imname = [framesdir '/' imname]; % add the full path
+im = imread(imname);
+imshow(im)
+pause;
+imsim = zeros(numfeats,1);
+
+for i = 1:numfeats
+    load([siftdir '/' fnames(i).name], 'descriptors', 'deepFC7');
+    imsim(i,:) = getSimilarity(deepFC7, origdeep);
+end
+
+M = 10;
+
+[~, simframes] = maxk(imsim,M+1);
+
+showSimFrames(img1_i, simframes(2:M+1,:),M);
